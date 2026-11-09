@@ -73,7 +73,9 @@ def _prepare_event_data(  # pylint: disable=too-many-arguments,too-many-position
         "distance": distance,
     }
     if load_target is not None:
-        event_data["load_target"] = load_target
+        # The calendar "Load" shown on planned workouts is icu_training_load.
+        # The API's own load_target field is not displayed for workouts.
+        event_data["icu_training_load"] = load_target
     return event_data
 
 
@@ -442,7 +444,7 @@ async def add_or_update_event(  # pylint: disable=too-many-arguments,too-many-po
         workout_type: Workout type (e.g. Ride, Run, Swim, Walk, Row)
         moving_time: Total expected moving time of the workout in seconds (optional). Use 0 (default) to omit from the request; 0 will not be transmitted to the API.
         distance: Total expected distance of the workout in meters (optional). Use 0 (default) to omit from the request; 0 will not be transmitted to the API.
-        load_target: Planned training load for the event (optional), shown on the calendar like a workout's estimated load. Useful for sessions without structured steps (climbing, strength, etc.). Use 0 (default) to omit; an existing value is then left unchanged on update.
+        load_target: Planned training load for the event (optional), sent as icu_training_load so it shows on the calendar like a workout's estimated load and feeds the fitness projection. Useful for sessions without structured steps (climbing, strength, etc.). Use 0 (default) to omit; an existing value is then left unchanged on update.
 
     Example:
         "workout_doc": {

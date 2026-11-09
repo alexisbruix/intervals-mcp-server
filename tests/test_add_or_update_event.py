@@ -870,7 +870,8 @@ def test_add_event_with_load_target(monkeypatch):
     )
 
     assert "Successfully created event id:" in result
-    assert fake.last_data["load_target"] == 65
+    assert fake.last_data["icu_training_load"] == 65
+    assert "load_target" not in fake.last_data
 
 
 def test_add_event_without_load_target_omits_field(monkeypatch):
@@ -887,4 +888,5 @@ def test_add_event_without_load_target_omits_field(monkeypatch):
         )
     )
 
+    assert "icu_training_load" not in fake.last_data
     assert "load_target" not in fake.last_data
