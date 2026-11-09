@@ -618,6 +618,7 @@ def _format_event_load_fields(event: dict[str, Any]) -> list[str]:
     """Return formatted load-metric lines that have data."""
     lines: list[str] = []
     _add_field(lines, "Training Load", _round1(event.get("icu_training_load")))
+    _add_field(lines, "Load Target", _round1(event.get("load_target")))
     _add_field(lines, "ATL", _round1(event.get("icu_atl")))
     _add_field(lines, "CTL", _round1(event.get("icu_ctl")))
     _add_field(lines, "Intensity", _round1(event.get("icu_intensity")))
@@ -637,6 +638,10 @@ def format_event_compact(event: dict[str, Any]) -> str:
     tl = event.get("icu_training_load")
     if tl is not None:
         parts.append(f"TL:{_round1(tl)}")
+
+    load_target = event.get("load_target")
+    if load_target is not None:
+        parts.append(f"Target:{_round1(load_target)}")
 
     atl = event.get("icu_atl")
     if atl is not None:

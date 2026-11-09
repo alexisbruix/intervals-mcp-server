@@ -56,13 +56,14 @@ def _prepare_event_data(  # pylint: disable=too-many-arguments,too-many-position
     workout_doc: WorkoutDoc | None,
     moving_time: int | None,
     distance: int | None,
+    load_target: int | None = None,
 ) -> dict[str, Any]:
     """Prepare event data dictionary for API request.
 
     Many arguments are required to match the Intervals.icu API event structure.
     """
     resolved_workout_type = resolve_activity_type(name, workout_type)
-    return {
+    event_data: dict[str, Any] = {
         "start_date_local": start_date + "T00:00:00",
         "category": "WORKOUT",
         "name": name,
@@ -71,6 +72,9 @@ def _prepare_event_data(  # pylint: disable=too-many-arguments,too-many-position
         "moving_time": moving_time,
         "distance": distance,
     }
+    if load_target is not None:
+        event_data["load_target"] = load_target
+    return event_data
 
 
 def _handle_event_response(
@@ -421,6 +425,7 @@ async def add_or_update_event(  # pylint: disable=too-many-arguments,too-many-po
     workout_doc: WorkoutDoc | None = None,
     moving_time: int = 0,
     distance: int = 0,
+    load_target: int = 0,
 ) -> str:
     """Post event for an athlete to Intervals.icu this follows the event api from intervals.icu
     If event_id is provided, the event will be updated instead of created.
@@ -437,6 +442,7 @@ async def add_or_update_event(  # pylint: disable=too-many-arguments,too-many-po
         workout_type: Workout type (e.g. Ride, Run, Swim, Walk, Row)
         moving_time: Total expected moving time of the workout in seconds (optional). Use 0 (default) to omit from the request; 0 will not be transmitted to the API.
         distance: Total expected distance of the workout in meters (optional). Use 0 (default) to omit from the request; 0 will not be transmitted to the API.
+        load_target: Planned training load for the event (optional), shown on the calendar like a workout's estimated load. Useful for sessions without structured steps (climbing, strength, etc.). Use 0 (default) to omit; an existing value is then left unchanged on update.
 
     Example:
         "workout_doc": {
@@ -496,7 +502,13 @@ async def add_or_update_event(  # pylint: disable=too-many-arguments,too-many-po
 
     try:
         event_data = _prepare_event_data(
-            name, workout_type, start_date, workout_doc, moving_time or None, distance or None
+            name,
+            workout_type,
+            start_date,
+            workout_doc,
+            moving_time or None,
+            distance or None,
+            load_target or None,
         )
         return await _create_or_update_event_request(
             athlete_id_to_use, api_key, event_data, start_date, event_id

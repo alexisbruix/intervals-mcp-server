@@ -851,3 +851,40 @@ def test_response_omits_missing_training_context(monkeypatch):
     assert "training load" not in result
     assert "fatigue" not in result
     assert "fitness" not in result
+
+
+def test_add_event_with_load_target(monkeypatch):
+    """load_target is passed through for sessions without structured steps."""
+    fake = FakeRequest()
+    _patch_request(monkeypatch, fake)
+
+    result = asyncio.run(
+        add_or_update_event(
+            athlete_id="i1",
+            start_date="2026-03-11",
+            name="Bouldering - Volume",
+            workout_type="RockClimbing",
+            moving_time=5400,
+            load_target=65,
+        )
+    )
+
+    assert "Successfully created event id:" in result
+    assert fake.last_data["load_target"] == 65
+
+
+def test_add_event_without_load_target_omits_field(monkeypatch):
+    """load_target=0 (default) is not sent, so updates keep the existing value."""
+    fake = FakeRequest()
+    _patch_request(monkeypatch, fake)
+
+    asyncio.run(
+        add_or_update_event(
+            athlete_id="i1",
+            start_date="2026-03-11",
+            name="Easy Ride",
+            workout_type="Ride",
+        )
+    )
+
+    assert "load_target" not in fake.last_data

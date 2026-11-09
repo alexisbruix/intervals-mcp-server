@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `add_or_update_event`: optional `load_target` (planned training load) for sessions
+  without structured steps (climbing, strength). Shown by `get_events`.
 - OAuth 2.0 (authorization code + PKCE) for the HTTP transport. Optional; activates
   only when `MCP_CLIENT_ID` and `MCP_CLIENT_SECRET` are set (`MCP_SERVER_URL` required
   for discovery). stdio transport is unaffected.
